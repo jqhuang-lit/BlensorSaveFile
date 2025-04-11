@@ -49,12 +49,44 @@ def savePLYFile(filepath, meshname):
     f.write(header)
     f.write(data)
 
-#for num in range(2,11):
-#    bpy.ops.blensor.delete_scans();
-#    bpy.ops.blensor.scan();
 
-for num in range(2,51):  # 假设循环范围为0到9
-    filepath = f"/home/dev/Public/Experiments/ex4/B2/0deg/noisy/B2_5m_x0y0z0_cam_x0y0z2_noisy_{num-1}.ply"  # 拼接文件路径
-    meshname = f"NoisyScan.{num:03d}"
-    savePLYFile(filepath, meshname)
 
+isdelete = 0
+isscan = 0
+issave = 0
+mode = "continues"
+
+if(isdelete):   
+    for num in range(0,154):
+        bpy.ops.blensor.delete_scans();
+  
+if(isscan):
+    for num in range(0,12):
+        bpy.ops.blensor.scan();
+  
+if(issave):    
+    for num in range(2,12):
+        filepath = f"D:/dataset/CameraPose_x5y5z95_{num-1}.ply"
+        meshname = f"Scan.{num:03d}"  
+        savePLYFile(filepath, meshname)
+
+if(mode == "continues"):
+    bpy.ops.blensor.scan();
+    bpy.ops.blensor.scan();
+    euler_0 = 0.0
+    euler_total = 90
+    num_frames = 100
+    for num in range(2,2+num_frames):  #2-153
+        bpy.ops.blensor.scan();
+    
+        euler_0_angle = euler_0/pi*180
+        filepath = f"D:/dataset/CameraPose_x5y5z95_ModelPose_x0y10z{-euler_0_angle:3f}_{num-1}.ply"
+        meshname = f"Scan.{num:03d}"
+        savePLYFile(filepath, meshname)
+        
+        euler_0 = euler_0 - (euler_total / num_frames)/180*pi
+        for i in bpy.context.visible_objects:
+            if i.name == "C919":           
+                bpy.data.objects["C919"].rotation_euler[2] = euler_0   
+      
+    
